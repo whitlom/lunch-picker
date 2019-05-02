@@ -66,22 +66,29 @@ export default {
   methods: {
     pick() {
       var self = this;
+      var testMode = false;
 
-      // Can we pick
-      var d = new Date();
-      var h = d.getHours();
-      var isLunchTime = ( ( h  >= 11 ) && ( h <= 13 )) ? true : false;
-      var isDayOld = (d - self.lastPickTime) > oneDay;
-
-      if(!isLunchTime) {
-        self.snackbar = true;
-        self.snackbar_msg = "Not Lunch Time";
-        return;
+      if(localStorage.testMode && localStorage.testMode == "true") {
+        testMode = true;
       }
-      if(!isDayOld) {
-        self.snackbar = true;
-        self.snackbar_msg = "Last pick less than a day old";
-        return;
+
+      if(testMode == false) {
+        // Can we pick
+        var d = new Date();
+        var h = d.getHours();
+        var isLunchTime = ( ( h  >= 11 ) && ( h <= 13 )) ? true : false;
+        var isDayOld = (d - self.lastPickTime) > oneDay;
+
+        if(!isLunchTime) {
+          self.snackbar = true;
+          self.snackbar_msg = "Not Lunch Time";
+          return;
+        }
+        if(!isDayOld) {
+          self.snackbar = true;
+          self.snackbar_msg = "Last pick less than a day old";
+          return;
+        }
       }
 
       self.places = [];
@@ -92,18 +99,20 @@ export default {
 
         self.chosenPick = self.places[Math.floor(Math.random() * self.places.length)];
  
-        historyRef.add({
-            "place": self.chosenPick,
-            "timestamp": Date.now(), 
-        });
+        if(testMode == false) {
+          historyRef.add({
+              "place": self.chosenPick,
+              "timestamp": Date.now(), 
+          });
 
-        querySnapshot.forEach(function(doc) {
-          var updatedPlaces = doc.data().places;
-          updatedPlaces[updatedPlaces.findIndex(el => el == self.chosenPick)] = "";
-          if(!_.isEqual(updatedPlaces, doc.data().places)) {
-            doc.ref.update({"places": updatedPlaces});
-          }
-        });
+          querySnapshot.forEach(function(doc) {
+            var updatedPlaces = doc.data().places;
+            updatedPlaces[updatedPlaces.findIndex(el => el == self.chosenPick)] = "";
+            if(!_.isEqual(updatedPlaces, doc.data().places)) {
+              doc.ref.update({"places": updatedPlaces});
+            }
+          });
+        }
       });
     }
   }

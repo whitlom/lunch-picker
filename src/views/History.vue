@@ -2,8 +2,6 @@
   <div class="history">
     <v-layout row wrap align-center>
         <h1 class="subheading grey--text">History</h1>
-        <!-- <v-spacer></v-spacer>
-        <v-btn large flat color="red" @click="deleteHistory()" slot="activator">Delete</v-btn> -->
     </v-layout>
     <v-container class="my-1" >  
         <v-layout row wrap align-center justify-center >
@@ -53,10 +51,9 @@ export default {
   },
   created: function() {
     var self = this;
-    historyRef.orderBy("timestamp", "desc").limit(5).onSnapshot(function(querySnapshot) {
+    historyRef.orderBy("timestamp", "desc").limit(20).onSnapshot(function(querySnapshot) {
           self.picks = [];
           querySnapshot.forEach(function(doc) {
-            //   debugger;
             var date = new Date(doc.data().timestamp);
             self.picks.push({"id": doc.id, "place": doc.data().place, "timestamp": date.toUTCString()})
           });
