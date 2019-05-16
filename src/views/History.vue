@@ -1,8 +1,16 @@
 <template>
   <div class="history">
-    <v-layout row wrap align-center>
-        <h1 class="subheading grey--text">History</h1>
+      <h1 class="subheading grey--text">History</h1>
+
+    <v-layout row wrap align-center >
+      <v-layout align-center justify-center v-for="user in users" :key="user.photoURL">
+              <v-avatar size="36px">
+                <img :src="user.photoURL">
+              </v-avatar>
+              <div>{{ user.count }}</div>
+      </v-layout>
     </v-layout>
+
     <v-container class="my-1" >  
         <v-layout row wrap align-center justify-center >
             <v-flex xs6>
@@ -31,13 +39,16 @@
 
 <script>
 import firebase from '@/fb'
+const usersRef = firebase.firestore().collection("users");
 const historyRef = firebase.firestore().collection("history")
 
 export default {
   data() {
     return {
       history: null,
-      picks: []
+      picks: [],
+      users: [],
+
     }
   },
   methods: {
@@ -51,6 +62,18 @@ export default {
   },
   created: function() {
     var self = this;
+
+    usersRef.get().then(function(querySnapshot) {
+      querySnapshot.forEach(function(doc) {
+        var users = doc.data();
+
+        historyRef.where("user", "==", doc.id).get().then(function(querySnapshot) {
+          users.count = querySnapshot.size;
+          self.users.push(users);
+        });
+      });
+    });
+
     historyRef.orderBy("timestamp", "desc").limit(20).onSnapshot(function(querySnapshot) {
           self.picks = [];
           querySnapshot.forEach(function(doc) {

@@ -20,8 +20,15 @@
         <v-layout pa-5 align-center justify-center>
                 <v-btn round large color="teal" class="white--text headline" @click="pick()" slot="activator">Pick</v-btn>
         </v-layout>
-        <v-layout pa-1 align-center justify-center>
-          <v-text-field large flat readonly label="Chosen Pick" v-model="chosenPick"></v-text-field>
+
+        <v-layout v-if="chosenPickUser" pa-1 row wrap  align-center justify-center>
+            <v-avatar  size="36px">
+              <img :src="chosenPickUser.photoURL">
+            </v-avatar>
+            <v-layout ml-2>
+              <v-text-field large flat readonly label="Chosen Pick" v-model="chosenPick"></v-text-field>
+            </v-layout>
+            
         </v-layout>
 
     </v-container>          
@@ -43,6 +50,7 @@ export default {
       users: [],
       places: [],
       chosenPick: null,
+      chosenPickUser: null,
       lastPickTime: null
     }
   },
@@ -67,6 +75,7 @@ export default {
     pick() {
       var self = this;
       var testMode = false;
+      var user = null;
 
       if(localStorage.testMode && localStorage.testMode == "true") {
         testMode = true;
@@ -100,17 +109,24 @@ export default {
         self.chosenPick = self.places[Math.floor(Math.random() * self.places.length)];
  
         if(testMode == false) {
-          historyRef.add({
-              "place": self.chosenPick,
-              "timestamp": Date.now(), 
-          });
-
           querySnapshot.forEach(function(doc) {
             var updatedPlaces = doc.data().places;
             updatedPlaces[updatedPlaces.findIndex(el => el == self.chosenPick)] = "";
             if(!_.isEqual(updatedPlaces, doc.data().places)) {
-              doc.ref.update({"places": updatedPlaces});
+              user = doc.ref.id;
+              usersRef.doc(user).get().then(function(doc) {
+                if (doc.exists) {
+                    self.chosenPickUser = doc.data();
+                }
+              });
+             doc.ref.update({"places": updatedPlaces});
             }
+          });
+
+          historyRef.add({
+              "place": self.chosenPick,
+              "timestamp": Date.now(),
+              "user": user 
           });
         }
       });
