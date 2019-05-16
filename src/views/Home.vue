@@ -106,6 +106,11 @@ export default {
             self.places = self.places.concat( _.without(doc.data().places, "", null)  )
         });
 
+        if(self.places.length == 0) {
+          self.snackbar = true;
+          self.snackbar_msg = "No places found to pick from.";
+          return;
+        } 
         self.chosenPick = self.places[Math.floor(Math.random() * self.places.length)];
  
         if(testMode == false) {
