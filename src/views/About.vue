@@ -18,7 +18,7 @@
       <p>The website and Lunch Roulette mobile app may contain links to external websites that are not provided or maintained by or in any way affiliated with </p>
       <p>Please note that the authors do not guarantee the accuracy, relevance, timeliness, or completeness of any information on these external websites.</p>
       </div>
-      <v-switch v-model="testMode" label="Test Mode" ></v-switch>
+      <!-- <v-switch v-model="testMode" label="Test Mode" ></v-switch> -->
 
     </v-container>          
   </div>
