@@ -42,6 +42,25 @@ const usersRef = firebase.firestore().collection("users");
 const historyRef = firebase.firestore().collection("history");
 const oneDay = 60 * 60 * 20 * 1000;
 
+function shuffle(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
+}
+
 export default {
   data() {
     return {
@@ -110,7 +129,8 @@ export default {
           self.snackbar = true;
           self.snackbar_msg = "No places found to pick from.";
           return;
-        } 
+        }
+        self.places = shuffle(self.places);
         self.chosenPick = self.places[Math.floor(Math.random() * self.places.length)];
  
         if(testMode == false) {
