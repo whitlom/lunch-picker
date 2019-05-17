@@ -133,7 +133,6 @@ export default {
         self.places = shuffle(self.places);
         self.chosenPick = self.places[Math.floor(Math.random() * self.places.length)];
  
-        if(testMode == false) {
           querySnapshot.forEach(function(doc) {
             var updatedPlaces = doc.data().places;
             updatedPlaces[updatedPlaces.findIndex(el => el == self.chosenPick)] = "";
@@ -144,16 +143,16 @@ export default {
                     self.chosenPickUser = doc.data();
                 }
               });
-             doc.ref.update({"places": updatedPlaces});
+              if(testMode == false) {
+                doc.ref.update({"places": updatedPlaces});
+              }
             }
           });
 
-          historyRef.add({
-              "place": self.chosenPick,
-              "timestamp": Date.now(),
-              "user": user 
-          });
-        }
+          if(testMode == false) {
+            historyRef.add({"place": self.chosenPick,"timestamp": Date.now(),"user": user });
+          }
+
       });
     }
   }
